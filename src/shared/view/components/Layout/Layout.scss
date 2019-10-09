@@ -1,0 +1,10 @@
+.layout {
+  min-width: 800px;
+  min-height: 100% !important;
+
+  &__content {
+    align-self: center;
+    max-width: 1200px;
+    width: 100%;
+  }
+}

@@ -1,0 +1,95 @@
+@import "./palette.scss";
+
+.ant-layout-header {
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  background-color: $mirage;
+}
+
+.ant-drawer {
+  &-header {
+    border: none;
+    background-color: $ebony-clay;
+  }
+
+  &-header,
+  &-title {
+    color: $wild-sand;
+  }
+
+  &-body {
+    padding: 0;
+    line-height: 1;
+  }
+
+  &-content {
+    color: $wild-sand;
+    background-color: $dark-pearl;
+  }
+}
+
+.ant-tabs {
+  &-nav {
+    width: 100%;
+
+    & > div {
+      width: 100%;
+      display: flex;
+    }
+  }
+
+  &-tab {
+    flex: 1;
+    text-align: center;
+  }
+}
+
+.ant-form-item-control {
+  .ant-form-item-control {
+    line-height: 0;
+  }
+
+  .ant-form-item {
+    margin: 0;
+  }
+}
+
+.ant-input {
+  color: $mirage;
+
+  &[disabled] {
+    background-color: unset;
+  }
+
+  &:focus {
+    box-shadow: none;
+  }
+}
+
+.ant-avatar {
+  background-color: $dark-calypso;
+
+  & > img {
+    height: unset;
+    min-height: 100%;
+  }
+}
+
+.ant-modal-content,
+.ant-modal-header {
+  background-color: $vulcan;
+}
+
+.ant-modal-close {
+  color: $wild-sand;
+}
+
+.ant-modal-footer,
+.ant-modal-header {
+  border-color: darken($vulcan, 3%);
+}
+
+.ant-message-notice-content {
+  background-color: $dark-calypso;
+}
