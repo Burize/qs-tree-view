@@ -7,28 +7,6 @@
   background-color: $mirage;
 }
 
-.ant-drawer {
-  &-header {
-    border: none;
-    background-color: $ebony-clay;
-  }
-
-  &-header,
-  &-title {
-    color: $wild-sand;
-  }
-
-  &-body {
-    padding: 0;
-    line-height: 1;
-  }
-
-  &-content {
-    color: $wild-sand;
-    background-color: $dark-pearl;
-  }
-}
-
 .ant-tabs {
   &-nav {
     width: 100%;
@@ -67,15 +45,6 @@
   }
 }
 
-.ant-avatar {
-  background-color: $dark-calypso;
-
-  & > img {
-    height: unset;
-    min-height: 100%;
-  }
-}
-
 .ant-modal-content,
 .ant-modal-header {
   background-color: $vulcan;
@@ -92,4 +61,21 @@
 
 .ant-message-notice-content {
   background-color: $dark-calypso;
+}
+
+.ant-tree {
+  color: $wild-sand;
+  & li .ant-tree-node {
+    &-content-wrapper {
+      color: inherit;
+
+      &:hover {
+        background-color: $dark-calypso;
+      }
+
+      &.ant-tree-node-selected {
+        background-color: $san-juan;
+      }
+    }
+  }
 }

@@ -38,7 +38,7 @@ const config: webpack.Configuration = {
         loader: 'ts-loader',
         options: {
           transpileOnly: true,
-        }
+        },
       },
       {
         test: /\.scss$/,
@@ -59,7 +59,7 @@ const config: webpack.Configuration = {
               plugins: () => {
                 return [
                   autoprefixer({
-                    browsers: ['last 2 versions'],
+                    overrideBrowserslist: ['last 2 versions'],
                   }),
                 ];
               },

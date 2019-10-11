@@ -1,0 +1,8 @@
+.data-base-redactor {
+  display: flex;
+  justify-content: space-around;
+
+  &__section {
+    flex: 1;
+  }
+}

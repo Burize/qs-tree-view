@@ -4,21 +4,19 @@ import ALayout from 'antd/lib/layout';
 import { block } from 'shared/helpers/bem';
 
 import 'antd/lib/layout/style/index.less';
-
-const { Header, Footer, Content } = ALayout;
-
 import './Layout.scss';
+
+const { Header, Content } = ALayout;
 
 const b = block('layout');
 
-class Layout extends React.PureComponent {
+class Layout extends React.Component {
   public render() {
     const { children } = this.props;
     return (
       <ALayout className={b()}>
         <Header />
-        <Content className={b('content').toString()}>{children}</Content>
-        <Footer />
+        <Content className={b('content')}>{children}</Content>
       </ALayout>
     );
   }
