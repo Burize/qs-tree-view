@@ -1,11 +1,13 @@
 @import "shared/styles/palette.scss";
 
 .layout {
-  background-color: $vulcan;
   min-height: 100%;
+  min-width: 52rem;
+  background-color: $vulcan;
   &__content {
     align-self: center;
     width: 100%;
     height: 100%;
+    padding: 1rem 2rem;
   }
 }

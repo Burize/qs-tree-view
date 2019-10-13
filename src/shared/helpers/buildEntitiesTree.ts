@@ -1,7 +1,7 @@
 import { IEntityNode, IEntity } from 'shared/types/models/entity';
 
-export default function build(entities: IEntity[]): IEntityNode[] {
-  const map = new Map([[null, []]]) as Map<null | string, IEntityNode[]>;
+export default function buildEntitiesTree(entities: IEntity[]): IEntityNode[] {
+  const map = new Map([['root', []]]) as Map<null | string, IEntityNode[]>;
 
   entities.forEach((e) => {
     map.set(e.id, []);
@@ -18,17 +18,16 @@ export default function build(entities: IEntity[]): IEntityNode[] {
             entity: { id, value, parentId, isRemoved },
             children: curr,
           });
-      } else {
-        tree.get(null)!.push(
-          {
-            entity: { id, value, parentId, isRemoved },
-            children: curr,
-          });
+        return tree;
       }
 
+      tree.get('root')!.push(
+        {
+          entity: { id, value, parentId, isRemoved },
+          children: curr,
+        });
       return tree;
     },
     map,
-  )
-    .get(null)!;
+  ).get('root')!;
 }

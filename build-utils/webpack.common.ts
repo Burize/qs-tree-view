@@ -83,6 +83,9 @@ const config: webpack.Configuration = {
           {
             loader: 'less-loader',
             options: {
+              modifyVars: {
+                'hack': `true; @import "${commonPaths.antdPalette}";`,
+              },
               javascriptEnabled: true,
             },
           },

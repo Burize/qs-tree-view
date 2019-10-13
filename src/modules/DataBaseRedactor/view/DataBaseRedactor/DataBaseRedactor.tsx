@@ -1,27 +1,45 @@
+import { bindAll } from 'lodash-decorators';
 import * as React from 'react';
-import { block } from 'shared/helpers/bem';
 
-import { DBView } from 'features/ManageDataBase';
+import { DBView, databaseContract } from 'features/ManageDataBase';
 import { CachedView, cacheContract } from 'features/ManageCachedData';
+import { ICommunication, initialCommunication, pendingCommunication, makeFailCommunication } from 'shared/helpers/communication';
+import { IEntity } from 'shared/types/models/entity';
+import { block } from 'shared/helpers/bem';
+import { Button } from 'shared/view/elements';
 import { Layout } from 'shared/view';
+import { delay } from 'shared/helpers/delay';
 
 import './DataBaseRedactor.scss';
-import { IEntity } from 'shared/types/models/entity';
 
-const b = block('data-base-redactor');
+const b = block('database-redactor');
 
-class DataBaseRedactor extends React.PureComponent {
+interface IState {
+  applyingToDatabase: ICommunication;
+}
+
+@bindAll()
+class DataBaseRedactor extends React.PureComponent<{}, IState> {
+  public state = { applyingToDatabase: initialCommunication };
+
   public render() {
     return (
       <Layout>
         <div className={b()}>
-          <div className={b('section')}>
-            <CachedView />
+          <div className={b('reset')}>
+            <Button type="primary" onClick={this.resetRedactor}>Reset</Button>
           </div>
-          <div className={b('section')}>
-            <DBView onLoadToCache={this.setEntityToCache} />
+          <div className={b('content')}>
+            <div className={b('column')}>
+              <CachedView
+                onApplyChangesToDatabase={this.applyChangesToDatabase}
+                applyingChangesToDatabase={this.state.applyingToDatabase}
+              />
+            </div>
+            <div className={b('column')}>
+              <DBView onLoadToCache={this.setEntityToCache} />
+            </div>
           </div>
-
         </div>
       </Layout>
     );
@@ -29,6 +47,22 @@ class DataBaseRedactor extends React.PureComponent {
 
   private setEntityToCache(entity: IEntity) {
     cacheContract.addToCache(entity);
+  }
+
+  private async applyChangesToDatabase(entities: IEntity[]) {
+    this.setState({ applyingToDatabase: pendingCommunication });
+    try {
+      await delay(1500);
+      databaseContract.applyToDataBase(entities);
+      this.setState({ applyingToDatabase: initialCommunication });
+    } catch (e) {
+      this.setState({ applyingToDatabase: makeFailCommunication(e.toString()) });
+    }
+  }
+
+  private resetRedactor() {
+    cacheContract.reset();
+    databaseContract.reset();
   }
 }
 

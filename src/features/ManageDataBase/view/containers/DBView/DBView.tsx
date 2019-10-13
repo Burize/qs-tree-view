@@ -7,8 +7,9 @@ import buildEntitiesTree from 'shared/helpers/buildEntitiesTree';
 import { block } from 'shared/helpers/bem';
 
 import { DBTreeView } from '../../components';
-import { dataBase } from '../../../state';
-// import './DBTreeView.scss';
+import { database } from '../../../state';
+
+import './DBView.scss';
 
 interface IProps {
   onLoadToCache(entity: IEntity): void;
@@ -19,38 +20,56 @@ interface IState {
   selectedEntityId: EntityId | null;
 }
 
-const b = block('DB-view');
+const b = block('db-view');
 
 @BindAll()
 export class DBView extends React.PureComponent<IProps, IState> {
   public state: IState = { entities: [], selectedEntityId: null };
+  private unsubscribeFromDatabaseUpdates?: () => void;
 
   public componentDidMount() {
     this.loadEntities();
+    this.unsubscribeFromDatabaseUpdates = database.onDatabaseUpdate(this.loadEntities);
+  }
+
+  public componentWillUnmount() {
+    this.unsubscribeFromDatabaseUpdates && this.unsubscribeFromDatabaseUpdates();
   }
 
   public render() {
     const { entities, selectedEntityId } = this.state;
     const entitiesTree = this.getEntitiesTree(entities);
 
+    const selectedEntity = entities.find(e => e.id === selectedEntityId);
+
+    const isEnabledLoadEntity = !!selectedEntity && !selectedEntity.isRemoved;
+
     return (
       <div className={b()}>
-        <DBTreeView
-          entities={entitiesTree}
-          selectedNodeId={selectedEntityId}
-          onSelect={this.selectEntity}
-        />
-        <Button onClick={this.loadToCache} disabled={selectedEntityId == null}>Load to cache</Button>
+        <div className={b('tree')}>
+          <DBTreeView
+            entities={entitiesTree}
+            selectedNodeId={selectedEntityId}
+            onSelect={this.selectEntity}
+          />
+        </div>
+        <Button
+          type="primary"
+          onClick={this.loadToCache}
+          disabled={!isEnabledLoadEntity}
+        >
+          Load to cache
+        </Button>
       </div>
     );
   }
 
   private async loadEntities() {
-    const entities = await dataBase.getAllEntities();
+    const entities = database.getEntities();
     this.setState({ entities });
   }
 
-  private selectEntity(entityId: EntityId) {
+  private selectEntity(entityId: EntityId | null) {
     this.setState({ selectedEntityId: entityId });
   }
 

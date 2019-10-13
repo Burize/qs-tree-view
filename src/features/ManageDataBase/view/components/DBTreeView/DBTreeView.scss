@@ -1,0 +1,9 @@
+@import "shared/styles/palette.scss";
+
+.db-tree-view {
+  &__node {
+    &_removed {
+      color: $valencia;
+    }
+  }
+}
