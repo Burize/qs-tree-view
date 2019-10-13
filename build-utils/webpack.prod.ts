@@ -9,6 +9,7 @@ const config: webpack.Configuration = {
   },
   output: {
     filename: 'static/[name].[hash].js',
+    publicPath: '.',
   },
   devtool: 'source-map',
   module: {

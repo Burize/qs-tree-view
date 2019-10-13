@@ -1,6 +1,6 @@
 ## QUANTUM SOFT TEST TASK
 
-Work with the database through the local cache.
+Work with the database through the local cache: [gh-pages](https://burize.github.io/qs-tree-view/)
 
 ### Used features
 
