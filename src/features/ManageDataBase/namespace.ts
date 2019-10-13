@@ -1,9 +1,9 @@
 import { IEntity } from 'shared/types/models/entity';
 
-export interface IDataBaseProviderContract {
+export interface IDatabaseProviderContract {
   applyToDataBase(entities: IEntity[]): void;
   reset(): void;
 
 }
 
-export type DatabaseRecord = Record<string, IEntity>;
+export type DatabaseRecords = Record<string, IEntity>;

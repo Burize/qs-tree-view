@@ -5,14 +5,14 @@
   "scripts": {
     "dev": "better-npm-run watch:dev",
     "prod": "better-npm-run watch:prod",
-    "analyze:dev": "better-npm-run analyze:dev"
+    "analyze:prod": "better-npm-run analyze:prod",
+    "build:prod": "better-npm-run build:prod"
   },
   "betterScripts": {
     "watch:dev": {
       "command": "node node_modules/.bin/webpack-dev-server --config webpack.config.ts",
       "env": {
         "NODE_ENV": "development",
-        "API_URL": "http://localhost:3030/",
         "TS_NODE_COMPILER_OPTIONS": "{\"target\": \"es5\", \"module\": \"commonjs\"}"
       }
     },
@@ -20,16 +20,21 @@
       "command": "node node_modules/.bin/webpack-dev-server --config webpack.config.ts",
       "env": {
         "NODE_ENV": "production",
-        "API_URL": "http://localhost:3030/",
         "TS_NODE_COMPILER_OPTIONS": "{\"target\": \"es5\", \"module\": \"commonjs\"}"
       }
     },
-    "analyze:dev": {
+    "analyze:prod": {
       "command": "node node_modules/.bin/webpack-dev-server --config webpack.config.ts",
       "env": {
         "WITH_ANALYZE_MODE": true,
-        "NODE_ENV": "development",
-        "API_URL": "http://localhost:3030/",
+        "NODE_ENV": "production",
+        "TS_NODE_COMPILER_OPTIONS": "{\"target\": \"es5\", \"module\": \"commonjs\"}"
+      }
+    },
+    "build:prod": {
+      "command": "node node_modules/.bin/webpack --config webpack.config.ts",
+      "env": {
+        "NODE_ENV": "production",
         "TS_NODE_COMPILER_OPTIONS": "{\"target\": \"es5\", \"module\": \"commonjs\"}"
       }
     }

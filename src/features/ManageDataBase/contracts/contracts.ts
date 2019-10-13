@@ -1,7 +1,7 @@
 import { database } from '../state';
-import { IDataBaseProviderContract } from '../namespace';
+import { IDatabaseProviderContract } from '../namespace';
 
-export const databaseContract: IDataBaseProviderContract = {
+export const databaseContract: IDatabaseProviderContract = {
   applyToDataBase: database.applyToDataBase,
   reset: database.reset,
 };

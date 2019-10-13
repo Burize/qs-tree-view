@@ -1,6 +1,6 @@
-import { DatabaseRecord } from '../namespace';
+import { DatabaseRecords } from '../namespace';
 
-export const initialEntities: DatabaseRecord = {
+export const initialEntities: DatabaseRecords = {
   '1': { id: '1', value: 'Node1', parentId: null, isRemoved: false },
   '2': { id: '2', value: 'Node2', parentId: '1', isRemoved: false },
   '3': { id: '3', value: 'Node3', parentId: '1', isRemoved: false },
