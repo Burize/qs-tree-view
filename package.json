@@ -10,21 +10,21 @@
   },
   "betterScripts": {
     "watch:dev": {
-      "command": "node node_modules/.bin/webpack-dev-server --config webpack.config.ts",
+      "command": "npx webpack-dev-server --config webpack.config.ts",
       "env": {
         "NODE_ENV": "development",
         "TS_NODE_COMPILER_OPTIONS": "{\"target\": \"es5\", \"module\": \"commonjs\"}"
       }
     },
     "watch:prod": {
-      "command": "node node_modules/.bin/webpack-dev-server --config webpack.config.ts",
+      "command": "npx webpack-dev-server --config webpack.config.ts",
       "env": {
         "NODE_ENV": "production",
         "TS_NODE_COMPILER_OPTIONS": "{\"target\": \"es5\", \"module\": \"commonjs\"}"
       }
     },
     "analyze:prod": {
-      "command": "node node_modules/.bin/webpack-dev-server --config webpack.config.ts",
+      "command": "npx webpack-dev-server --config webpack.config.ts",
       "env": {
         "WITH_ANALYZE_MODE": true,
         "NODE_ENV": "production",
@@ -32,7 +32,7 @@
       }
     },
     "build:prod": {
-      "command": "node node_modules/.bin/webpack --config webpack.config.ts",
+      "command": "npx webpack --config webpack.config.ts",
       "env": {
         "NODE_ENV": "production",
         "TS_NODE_COMPILER_OPTIONS": "{\"target\": \"es5\", \"module\": \"commonjs\"}"
