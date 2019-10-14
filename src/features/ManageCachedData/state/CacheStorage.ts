@@ -76,6 +76,20 @@ class CacheStorage {
     return entities.filter(e => modifiedEntitiesIds[e.id]);
   }
 
+  public updateCache(modifiedEntities: IEntity[]) {
+    const entities = this.getEntitiesFromStorage();
+
+    const updatedEntities = modifiedEntities.reduce((acc, curr) => {
+      if (acc[curr.id]) {
+        acc[curr.id] = curr;
+      }
+      return acc;
+    }, entities);
+
+    this.saveEntities(updatedEntities);
+    this.notifyCacheChanged();
+  }
+
   public onCacheApplied() {
     localStorage.removeItem(storageKeys.modifiedEntities);
   }

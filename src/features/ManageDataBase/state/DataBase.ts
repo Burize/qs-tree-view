@@ -1,7 +1,7 @@
 import { BindAll } from 'lodash-decorators';
 
 import { Observer, ObserverHandler } from 'shared/helpers/Observer';
-import { IEntity } from 'shared/types/models/entity';
+import { IEntity, EntityId } from 'shared/types/models/entity';
 
 import { DatabaseRecords } from '../namespace';
 import { initialEntities } from './initial';
@@ -27,24 +27,50 @@ class DataBase {
     return Object.values(entities);
   }
 
-  public applyToDataBase(updatedEntities: IEntity[]) {
-    const entities = this.getEntitiesFromStorage();
-    const entitiesArray = Object.values(entities);
+  public applyToDataBase(modifiedEntities: IEntity[], allEntitiesIdsInCache: EntityId[]): IEntity[] {
+    const databaseEntities = this.getEntitiesFromStorage();
 
-    updatedEntities.forEach(entity => {
-      const isNeedRemoveChildren = entities[entity.id] && !entities[entity.id].isRemoved && entity.isRemoved;
-      entities[entity.id] = entity;
-      if (isNeedRemoveChildren) {
-        this.deleteEntityChildren(entitiesArray, entity);
+    const deletedEntities = new Set<EntityId>(modifiedEntities
+      .filter(entity => databaseEntities[entity.id] && !databaseEntities[entity.id].isRemoved && entity.isRemoved).
+      map(entity => entity.id));
+
+    const updatedDatabaseEntities = modifiedEntities.reduce((acc, cur) => {
+      acc[cur.id] = cur;
+      return acc;
+    }, { ...databaseEntities });
+    const updatedDatabaseEntitiesArray = Object.values(updatedDatabaseEntities);
+
+    const updatedEntitiesIds = new Set<EntityId>();
+    modifiedEntities.forEach(entity => {
+      if (deletedEntities.has(entity.id)) {
+        this.deleteEntityChildren(updatedDatabaseEntitiesArray, updatedEntitiesIds, entity);
       }
     });
+    this.saveEntities(updatedDatabaseEntities);
 
-    this.saveEntities(entities);
+    const allEntitiesIdsInCacheMap = new Set(allEntitiesIdsInCache);
+    return [...updatedEntitiesIds]
+      .filter(entityId => updatedDatabaseEntities[entityId] && allEntitiesIdsInCacheMap.has(entityId))
+      .map(entityId => ({ ...updatedDatabaseEntities[entityId] }));
   }
 
   public reset() {
     localStorage.setItem(storageKeys.entities, JSON.stringify(initialEntities));
     this.notifyDatabaseChanged();
+  }
+
+  // In this case, it would be better to use immutable data (arguments),
+  // but since the task states that the database is very large,
+  // so recursive calls mutate their arguments.
+  private deleteEntityChildren(allEntities: IEntity[], updatedEntities: Set<EntityId>, entity: IEntity) {
+    entity.isRemoved = true;
+    updatedEntities.add(entity.id);
+    allEntities
+      .forEach(e => {
+        if (e.parentId === entity.id && !e.isRemoved) {
+          this.deleteEntityChildren(allEntities, updatedEntities, e);
+        }
+      });
   }
 
   private initialize() {
@@ -60,16 +86,6 @@ class DataBase {
       throw new Error(EMPTY_STORAGE);
     }
     return JSON.parse(storageEntities);
-  }
-
-  private deleteEntityChildren(allEntities: IEntity[], entity: IEntity) {
-    entity.isRemoved = true;
-    allEntities
-      .forEach(e => {
-        if (e.parentId === entity.id && !e.isRemoved) {
-          this.deleteEntityChildren(allEntities, e);
-        }
-      });
   }
 
   private saveEntities(entities: DatabaseRecords) {

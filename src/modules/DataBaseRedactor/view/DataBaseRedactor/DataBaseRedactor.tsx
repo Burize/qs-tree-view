@@ -4,7 +4,7 @@ import * as React from 'react';
 import { DBView, databaseContract } from 'features/ManageDataBase';
 import { CachedView, cacheContract } from 'features/ManageCachedData';
 import { ICommunication, initialCommunication, pendingCommunication, makeFailCommunication } from 'shared/helpers/communication';
-import { IEntity } from 'shared/types/models/entity';
+import { IEntity, EntityId } from 'shared/types/models/entity';
 import { block } from 'shared/helpers/bem';
 import { Button } from 'shared/view/elements';
 import { Layout } from 'shared/view';
@@ -49,11 +49,12 @@ class DataBaseRedactor extends React.PureComponent<{}, IState> {
     cacheContract.addToCache(entity);
   }
 
-  private async applyChangesToDatabase(entities: IEntity[]) {
+  private async applyChangesToDatabase(entities: IEntity[], allEntitiesIds: EntityId[]) {
     this.setState({ applyingToDatabase: pendingCommunication });
     try {
       await delay(1500);
-      databaseContract.applyToDataBase(entities);
+      const modifiedEntities = databaseContract.applyToDataBase(entities, allEntitiesIds);
+      cacheContract.updateCache(modifiedEntities);
       this.setState({ applyingToDatabase: initialCommunication });
     } catch (e) {
       this.setState({ applyingToDatabase: makeFailCommunication(e.toString()) });

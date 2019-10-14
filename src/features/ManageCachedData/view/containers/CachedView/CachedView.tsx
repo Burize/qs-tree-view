@@ -14,7 +14,7 @@ import './CachedView.scss';
 
 interface IProps {
   applyingChangesToDatabase: ICommunication;
-  onApplyChangesToDatabase(entities: IEntity[]): void;
+  onApplyChangesToDatabase(entities: IEntity[], allEntitiesIds: EntityId[]): void;
 }
 
 interface IState {
@@ -149,7 +149,8 @@ export class CachedView extends React.PureComponent<IProps, IState> {
 
   private applyToDatabase() {
     const modifiedEntities = cacheStorage.getModifiedEntities();
-    this.props.onApplyChangesToDatabase(modifiedEntities);
+    const allEntitiesIds: EntityId[] = cacheStorage.getEntities().map(e => e.id);
+    this.props.onApplyChangesToDatabase(modifiedEntities, allEntitiesIds);
   }
 
   private onApplyingCacheError() {
