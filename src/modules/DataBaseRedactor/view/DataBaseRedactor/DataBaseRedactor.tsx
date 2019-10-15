@@ -6,7 +6,7 @@ import { CachedView, cacheContract } from 'features/ManageCachedData';
 import { ICommunication, initialCommunication, pendingCommunication, makeFailCommunication } from 'shared/helpers/communication';
 import { IEntity, EntityId } from 'shared/types/models/entity';
 import { block } from 'shared/helpers/bem';
-import { Button } from 'shared/view/elements';
+import { Button, message } from 'shared/view/elements';
 import { Layout } from 'shared/view';
 import { delay } from 'shared/helpers/delay';
 
@@ -45,8 +45,12 @@ class DataBaseRedactor extends React.PureComponent<{}, IState> {
     );
   }
 
-  private setEntityToCache(entity: IEntity) {
-    cacheContract.addToCache(entity);
+  private setEntityToCache(entity: IEntity, parentsIds: EntityId[]) {
+    try {
+      cacheContract.addToCache(entity, parentsIds);
+    } catch (e) {
+      message.error(e.message || e.toString());
+    }
   }
 
   private async applyChangesToDatabase(entities: IEntity[], allEntitiesIds: EntityId[]) {

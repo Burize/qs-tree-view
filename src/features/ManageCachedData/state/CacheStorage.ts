@@ -8,6 +8,7 @@ import { CacheRecords } from '../namespace';
 
 const storageKeys = {
   entities: 'cache.entities',
+  entitiesAncestors: 'cache.entitiesAncestors',
   modifiedEntities: 'cache.modifiedEntities',
 };
 
@@ -27,24 +28,29 @@ class CacheStorage {
     return Object.values(entities);
   }
 
-  public addToCache(entity: IEntity) {
+  public addToCache(entity: IEntity, ancestorsIds: EntityId[]) {
     const entities = this.getEntitiesFromStorage();
     if (entities[entity.id]) {
       throw new Error(ENTITY_ALREADY_EXIST);
     }
 
-    entities[entity.id] = entity;
+    const isNeedDeleteEntity = !!ancestorsIds.find(id => entities[id] && entities[id].isRemoved);
+    this.setEntityAncestors(entity.id, ancestorsIds);
+
+    entities[entity.id] = isNeedDeleteEntity ? { ...entity, isRemoved: true } : entity;
+
     localStorage.setItem(storageKeys.entities, JSON.stringify(entities));
+
     this.notifyCacheChanged();
   }
 
   public createEntity(value: string, parentId: EntityId) {
     const entities = this.getEntitiesFromStorage();
-
     const newEntity: IEntity = { id: uuid(), value, parentId, isRemoved: false };
     entities[newEntity.id] = newEntity;
 
     this.setModifiedEntity(newEntity.id);
+    this.setAncestorsToNewEntity(newEntity.id, parentId);
     this.saveEntities(entities);
   }
 
@@ -65,9 +71,10 @@ class CacheStorage {
       throw new Error(ENTITY_IS_NOT_EXIST);
     }
 
-    this.deleteEntityChildren(Object.values(entities), entities[id]);
+    entities[id] = { ...entities[id], isRemoved: true };
+    const updatedEntities = this.deleteEntityChildren(entities, entities[id].id);
     this.setModifiedEntity(id);
-    this.saveEntities(entities);
+    this.saveEntities(updatedEntities);
   }
 
   public getModifiedEntities(): IEntity[] {
@@ -96,6 +103,7 @@ class CacheStorage {
 
   public reset() {
     localStorage.removeItem(storageKeys.entities);
+    localStorage.removeItem(storageKeys.entitiesAncestors);
     localStorage.removeItem(storageKeys.modifiedEntities);
     this.notifyCacheChanged();
   }
@@ -105,13 +113,33 @@ class CacheStorage {
     return storageEntities ? JSON.parse(storageEntities) : {};
   }
 
-  private deleteEntityChildren(allEntities: IEntity[], entity: IEntity) {
-    entity.isRemoved = true;
-    allEntities.forEach(e => {
-      if (e.parentId === entity.id && !e.isRemoved) {
-        this.deleteEntityChildren(allEntities, e);
+  private getEntitiesAncestorsFromStorage(): Record<string, EntityId[]> {
+    const storageEntities = localStorage.getItem(storageKeys.entitiesAncestors);
+    return storageEntities ? JSON.parse(storageEntities) : {};
+  }
+
+  private setEntityAncestors(id: EntityId, ancestorsIds: EntityId[]) {
+    const entitiesAncestors = this.getEntitiesAncestorsFromStorage();
+    entitiesAncestors[id] = [...ancestorsIds];
+    localStorage.setItem(storageKeys.entitiesAncestors, JSON.stringify(entitiesAncestors));
+  }
+
+  private setAncestorsToNewEntity(id: EntityId, parentId: EntityId) {
+    const entitiesAncestors = this.getEntitiesAncestorsFromStorage();
+    entitiesAncestors[id] = [parentId, ...entitiesAncestors[parentId]];
+    localStorage.setItem(storageKeys.entitiesAncestors, JSON.stringify(entitiesAncestors));
+  }
+
+  private deleteEntityChildren(allEntities: Record<string, IEntity>, deletedEntityId: EntityId) {
+    const entitiesAncestors = this.getEntitiesAncestorsFromStorage();
+
+    Object.entries(entitiesAncestors).map(([entityId, ancestors]) => {
+      if (ancestors.find(id => id === deletedEntityId)) {
+        allEntities[entityId] = { ...allEntities[entityId], isRemoved: true };
       }
     });
+
+    return { ...allEntities };
   }
 
   private notifyCacheChanged() {

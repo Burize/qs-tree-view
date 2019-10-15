@@ -27,6 +27,22 @@ class DataBase {
     return Object.values(entities);
   }
 
+  public getEntityAncestors(id: EntityId): EntityId[] {
+    const entities = this.getEntitiesFromStorage();
+
+    const ancestorsIds = new Set<EntityId>();
+
+    const parentId = entities[id].parentId;
+
+    let parent: IEntity | null = parentId && entities[parentId];
+    while (parent) {
+      ancestorsIds.add(parent.id);
+      parent = parent.parentId && entities[parent.parentId];
+    }
+
+    return [...ancestorsIds];
+  }
+
   public applyToDataBase(modifiedEntities: IEntity[], allEntitiesIdsInCache: EntityId[]): IEntity[] {
     const databaseEntities = this.getEntitiesFromStorage();
 

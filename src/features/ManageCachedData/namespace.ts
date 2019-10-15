@@ -1,7 +1,7 @@
-import { IEntity } from 'shared/types/models/entity';
+import { IEntity, EntityId } from 'shared/types/models/entity';
 
 export interface ICacheProviderContract {
-  addToCache(entity: IEntity): void;
+  addToCache(entity: IEntity, parentsIds: EntityId[]): void;
   updateCache(entities: IEntity[]): void;
   reset(): void;
 }
