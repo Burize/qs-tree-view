@@ -6,7 +6,8 @@
     "dev": "better-npm-run watch:dev",
     "prod": "better-npm-run watch:prod",
     "analyze:prod": "better-npm-run analyze:prod",
-    "build:prod": "better-npm-run build:prod"
+    "build:prod": "better-npm-run build:prod",
+    "build:ghPages": "better-npm-run build:ghPages"
   },
   "betterScripts": {
     "watch:dev": {
