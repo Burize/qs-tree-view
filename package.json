@@ -37,6 +37,14 @@
         "NODE_ENV": "production",
         "TS_NODE_COMPILER_OPTIONS": "{\"target\": \"es5\", \"module\": \"commonjs\"}"
       }
+    },
+    "build:ghPages": {
+      "command": "npx webpack --config webpack.config.ts",
+      "env": {
+        "NODE_ENV": "production",
+        "FOR_GH_PAGES": true,
+        "TS_NODE_COMPILER_OPTIONS": "{\"target\": \"es5\", \"module\": \"commonjs\"}"
+      }
     }
   },
   "dependencies": {

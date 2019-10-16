@@ -45,9 +45,9 @@ class DataBaseRedactor extends React.PureComponent<{}, IState> {
     );
   }
 
-  private setEntityToCache(entity: IEntity, parentsIds: EntityId[]) {
+  private setEntityToCache(entity: IEntity) {
     try {
-      cacheContract.addToCache(entity, parentsIds);
+      cacheContract.addToCache(entity);
     } catch (e) {
       message.error(e.message || e.toString());
     }

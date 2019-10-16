@@ -2,14 +2,13 @@ import * as commonPaths from './common-paths';
 import * as webpack from 'webpack';
 import * as MiniCssExtractPlugin from 'mini-css-extract-plugin';
 
-const config: webpack.Configuration = {
+const config: webpack.Configuration & { devServer: any } = { // devServer is not exist at webpack.Configuration
   mode: 'production',
   entry: {
     app: `${commonPaths.appEntry}/index.tsx`,
   },
   output: {
     filename: 'static/[name].[hash].js',
-    publicPath: '.',
   },
   devtool: 'source-map',
   module: {
@@ -38,6 +37,13 @@ const config: webpack.Configuration = {
       filename: 'styles/[name].[hash].css',
     }),
   ],
+  devServer: {
+    host: 'localhost',
+    port: 3000,
+    historyApiFallback: true,
+    hot: true,
+    open: true,
+  },
 };
 
 export default config;

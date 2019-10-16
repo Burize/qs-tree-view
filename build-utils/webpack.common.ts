@@ -8,7 +8,7 @@ import * as autoprefixer from 'autoprefixer';
 
 import getEnvParams from '../src/shared/helpers/getEnvParams';
 
-const { withAnalyze } = getEnvParams();
+const { withAnalyze, forGhPages } = getEnvParams();
 
 const envs = Object.entries(process.env).reduce(
   (acc, [name, value]) => ({ ...acc, [`process.env.${name}`]: JSON.stringify(value) }), {},
@@ -21,7 +21,7 @@ const config: webpack.Configuration = {
   },
   output: {
     path: commonPaths.outputPath,
-    publicPath: '/',
+    publicPath: forGhPages ? '.' : '/',
   },
   module: {
     rules: [

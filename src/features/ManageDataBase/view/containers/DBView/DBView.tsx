@@ -12,7 +12,7 @@ import { database } from '../../../state';
 import './DBView.scss';
 
 interface IProps {
-  onLoadToCache(entity: IEntity, parentsIds: EntityId[]): void;
+  onLoadToCache(entity: IEntity): void;
 }
 
 interface IState {
@@ -86,7 +86,6 @@ export class DBView extends React.PureComponent<IProps, IState> {
       throw new Error('Entity with specified id was not exist');
     }
 
-    const parentsIds = database.getEntityAncestors(entity.id);
-    this.props.onLoadToCache(entity, parentsIds);
+    this.props.onLoadToCache(entity);
   }
 }
