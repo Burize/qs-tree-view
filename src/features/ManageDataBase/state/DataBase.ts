@@ -43,36 +43,46 @@ class DataBase {
     return [...ancestorsIds];
   }
 
-  public applyToDataBase(modifiedEntities: IEntity[], allEntitiesIdsInCache: EntityId[]): IEntity[] {
+  public applyToDataBase(modifiedCacheEntities: IEntity[], allEntitiesIdsInCache: EntityId[]): IEntity[] {
     const databaseEntities = this.getEntitiesFromStorage();
+    const deletedEntitiesIds = new Set<EntityId>(
+      modifiedCacheEntities
+        .filter(entity => databaseEntities[entity.id] && !databaseEntities[entity.id].isRemoved && entity.isRemoved).
+        map(entity => entity.id),
+    );
 
-    const deletedEntities = new Set<EntityId>(modifiedEntities
-      .filter(entity => databaseEntities[entity.id] && !databaseEntities[entity.id].isRemoved && entity.isRemoved).
-      map(entity => entity.id));
+    const modifiedDatabaseEntities = Object.values(
+      modifiedCacheEntities.reduce((acc, cur) => {
+        acc[cur.id] = cur;
+        return acc;
+      }, databaseEntities));
 
-    const updatedDatabaseEntities = modifiedEntities.reduce((acc, cur) => {
-      acc[cur.id] = cur;
-      return acc;
-    }, { ...databaseEntities });
-    const updatedDatabaseEntitiesArray = Object.values(updatedDatabaseEntities);
-
-    const updatedEntitiesIds = new Set<EntityId>();
-    modifiedEntities.forEach(entity => {
-      if (deletedEntities.has(entity.id)) {
-        this.deleteEntityChildren(updatedDatabaseEntitiesArray, updatedEntitiesIds, entity);
-      }
-    });
-    this.saveEntities(updatedDatabaseEntities);
+    const [finalEntities, updatedEntitiesIds] =
+      this.deleteEntities(modifiedDatabaseEntities, modifiedCacheEntities, deletedEntitiesIds);
+    this.saveEntitiesArray(finalEntities);
 
     const allEntitiesIdsInCacheMap = new Set(allEntitiesIdsInCache);
-    return [...updatedEntitiesIds]
-      .filter(entityId => updatedDatabaseEntities[entityId] && allEntitiesIdsInCacheMap.has(entityId))
-      .map(entityId => ({ ...updatedDatabaseEntities[entityId] }));
+    return finalEntities
+      .filter(e => updatedEntitiesIds.has(e.id) && allEntitiesIdsInCacheMap.has(e.id));
   }
 
   public reset() {
     localStorage.setItem(storageKeys.entities, JSON.stringify(initialEntities));
     this.notifyDatabaseChanged();
+  }
+
+  private deleteEntities(
+    allEntities: IEntity[],
+    modifiedEntities: IEntity[],
+    deletedEntitiesIds: Set<EntityId>): [IEntity[], Set<EntityId>] {
+    const updatedEntitiesIds = new Set<EntityId>();
+    modifiedEntities.forEach(entity => {
+      if (deletedEntitiesIds.has(entity.id)) {
+        this.deleteEntityChildren(allEntities, updatedEntitiesIds, entity);
+      }
+    });
+
+    return [[...allEntities], updatedEntitiesIds];
   }
 
   // In this case, it would be better to use immutable data (arguments),
@@ -102,6 +112,14 @@ class DataBase {
       throw new Error(EMPTY_STORAGE);
     }
     return JSON.parse(storageEntities);
+  }
+
+  private saveEntitiesArray(entities: IEntity[]) {
+    const finalEntitiesMap = entities.reduce((acc, cur) => {
+      acc[cur.id] = cur;
+      return acc;
+    }, {} as DatabaseRecords);
+    this.saveEntities(finalEntitiesMap);
   }
 
   private saveEntities(entities: DatabaseRecords) {
